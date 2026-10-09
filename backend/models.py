@@ -7,6 +7,12 @@ Section = Literal[
     "leverage",
 ]
 SECTIONS = set(Section.__args__)
+SECTION_LABELS = {
+    "in_scope": "Inside scope", "out_of_scope": "Outside scope but influencing", "patterns": "Patterns over time",
+    "relationships": "Relationships", "assumptions": "Assumptions", "stakeholders": "Stakeholders",
+    "loops": "Possible feedback loops", "boundaries": "System boundaries", "leverage": "Possible leverage",
+}
+EPISTEMIC_LABELS = {"known": "Known", "inferred": "Inferred", "unknown": "Unknown"}
 Epistemic = Literal["known", "inferred", "unknown"]
 UserEpistemic = Literal["known", "unknown"]
 Stage = Literal["focus", "see", "decide", "learn"]
@@ -117,6 +123,30 @@ class LearningIn(BaseModel):
     revise: str = Field(default="", max_length=2000)
 
 
+class Link(Doc):
+    id: str
+    from_id: str
+    to_id: str
+    note: str = ""
+    epistemic: Epistemic = "unknown"
+    created_at: str
+
+
+class LinkIn(BaseModel):
+    from_id: str
+    to_id: str
+    note: str = Field(default="", max_length=300)
+    epistemic: UserEpistemic = "unknown"
+
+
+class TimelineEvent(Doc):
+    id: str
+    kind: str
+    summary: str
+    detail: dict = {}
+    created_at: str
+
+
 class Analysis(Doc):
     id: str
     user_id: str
@@ -127,6 +157,7 @@ class Analysis(Doc):
     focus_question: str = ""
     stage: Stage = "focus"
     items: List[Item] = []
+    links: List[Link] = []
     experiments: List[Experiment] = []
     learnings: List[Learning] = []
     created_at: str

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { ArrowUp, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ const OPENERS = {
   learn: "Help me make sense of what happened when I tried something.",
 };
 
-export const GuidePanel = ({ analysisId, stage, onAnalysisChange, onClose }) => {
+export const GuidePanel = forwardRef(({ analysisId, stage, onAnalysisChange, onClose }, ref) => {
   const [messages, setMessages] = useState(null);
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState(null);
@@ -45,6 +45,13 @@ export const GuidePanel = ({ analysisId, stage, onAnalysisChange, onClose }) => 
   };
 
   const replaceMessage = (msg) => setMessages((list) => list.map((m) => (m.id === msg.id ? msg : m)));
+
+  useImperativeHandle(ref, () => ({
+    ask: (text) => {
+      if (streaming !== null || messages === null) return toast.info("The Guide is still replying — try again in a moment.");
+      send(text);
+    },
+  }));
   const accept = async (proposal, body) => {
     try {
       const { data } = await api.post(`/analyses/${analysisId}/guide/proposals/${proposal.id}/accept`, body);
@@ -96,4 +103,5 @@ export const GuidePanel = ({ analysisId, stage, onAnalysisChange, onClose }) => 
       </form>
     </div>
   );
-};
+});
+GuidePanel.displayName = "GuidePanel";

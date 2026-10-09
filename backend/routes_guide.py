@@ -9,8 +9,8 @@ from fastapi.responses import StreamingResponse
 from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
 
 from core import db, now_iso, new_id, get_current_user
-from models import SECTIONS, Analysis, GuideMessage, GuideMessageIn, ProposalAccept
-from routes_analyses import load_analysis, save_and_return
+from models import SECTIONS, SECTION_LABELS, Analysis, GuideMessage, GuideMessageIn, ProposalAccept
+from routes_analyses import load_analysis, save_and_return, log_event
 
 router = APIRouter(prefix="/analyses/{analysis_id}/guide", tags=["guide"])
 logger = logging.getLogger(__name__)
@@ -35,6 +35,7 @@ Rules:
 - You cannot change the analysis. You may PROPOSE up to 3 additions; the user decides whether to add them.
 - Proposals: epistemic "known" ONLY if restating something the user explicitly said in chat that is not yet in the analysis; "inferred" for your hypotheses; "unknown" for things that need checking.
 - Keep it short and warm: under 170 words before proposals. Plain text, no markdown headings, no bullet lists.
+- If the user asks how they could check an item, suggest ONE small, low-cost way to verify it (who to ask, what to observe, what quick data to look at), framed tentatively; name what would count as a sign either way; then ask your one question.
 
 Reply format (labels in capitals, each on its own line; omit a label if empty, but ALWAYS end the text with QUESTION):
 YOU TOLD ME: ...
@@ -47,12 +48,6 @@ Optionally after the text, include proposals exactly like this:
 [{"section": "<one of: in_scope, out_of_scope, patterns, relationships, assumptions, stakeholders, loops, boundaries, leverage>", "text": "<concise item, max 140 chars>", "epistemic": "inferred|unknown|known", "rationale": "<why, max 120 chars>"}]
 PROPOSALS>>>
 When the user shares a new concrete fact in chat that is not yet in the analysis, propose it as "known" in the fitting section. Otherwise only propose when it genuinely helps."""
-
-SECTION_LABELS = {
-    "in_scope": "Inside scope", "out_of_scope": "Outside scope but influencing", "patterns": "Patterns over time",
-    "relationships": "Relationships", "assumptions": "Assumptions", "stakeholders": "Stakeholders",
-    "loops": "Possible feedback loops", "boundaries": "System boundaries", "leverage": "Possible leverage",
-}
 
 
 def _context(analysis: dict, history: List[dict], stage: str) -> str:
@@ -68,6 +63,9 @@ def _context(analysis: dict, history: List[dict], stage: str) -> str:
         if items:
             lines.append(f"{label}:")
             lines += [f"  - [{i['epistemic'].upper()}{', from guide' if i['source'] == 'guide' else ''}] {i['text']}" for i in items]
+    names = {i["id"]: i["text"] for i in analysis.get("items", [])}
+    for lk in analysis.get("links", []):
+        lines.append(f"Link [{lk['epistemic'].upper()}]: {names.get(lk['from_id'], '?')} -> may influence -> {names.get(lk['to_id'], '?')}{' (' + lk['note'] + ')' if lk.get('note') else ''}")
     for e in analysis.get("experiments", []):
         lines.append(f"Experiment ({e['status']}): {e['title']} | action: {e['action']} | testing: {e['hypothesis']} | signal: {e['signal']}")
     for le in analysis.get("learnings", []):
@@ -160,6 +158,9 @@ async def accept_proposal(analysis_id: str, proposal_id: str, body: ProposalAcce
         "source": "guide", "created_at": ts, "updated_at": ts,
     }
     analysis: Analysis = await save_and_return(analysis_id, user["user_id"], {"$push": {"items": item}})
+    await log_event(analysis_id, user["user_id"], "guide_confirmed",
+                    f"Confirmed a Guide proposal: “{item['text'][:90]}” in {SECTION_LABELS[item['section']]}",
+                    item_id=item["id"], section=item["section"], epistemic=item["epistemic"], source="guide")
     await db.guide_messages.update_one(
         {"analysis_id": analysis_id, "proposals.id": proposal_id},
         {"$set": {"proposals.$.status": "accepted", "proposals.$.item_id": item["id"]}},

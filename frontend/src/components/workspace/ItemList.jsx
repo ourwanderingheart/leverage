@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MoreHorizontal, Pencil, Sparkles, Trash2, CheckCircle2, HelpCircle, Plus, Loader2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Sparkles, Trash2, CheckCircle2, HelpCircle, Plus, Loader2, SearchCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +33,11 @@ const ItemRow = ({ item, actions }) => {
         {item.source === "guide" && (
           <p className="mt-1 inline-flex items-center gap-1 text-[11px] text-violet-300/80"><Sparkles className="h-3 w-3" />Proposed by the Guide · confirmed by you{item.note ? ` — ${item.note}` : ""}</p>
         )}
+        {item.epistemic !== "known" && actions.askGuide && !editing && (
+          <button onClick={() => actions.askGuide(item)} className="mt-1.5 flex items-center gap-1 text-[11px] text-sky-300/90 transition-colors hover:text-sky-200" data-testid={`item-check-${item.id}`}>
+            <SearchCheck className="h-3 w-3" />How could I check this?
+          </button>
+        )}
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -56,9 +61,9 @@ const ItemRow = ({ item, actions }) => {
   );
 };
 
-const KindToggle = ({ value, onChange, section }) => (
+export const KindToggle = ({ value, onChange, section, labels = { known: "Known", unknown: "To check" } }) => (
   <div className="flex shrink-0 rounded-full border lwm-line p-0.5 text-xs">
-    {[["known", "Known"], ["unknown", "To check"]].map(([k, label]) => (
+    {Object.entries(labels).map(([k, label]) => (
       <button key={k} type="button" onClick={() => onChange(k)} data-testid={`add-${section}-kind-${k}`}
         className={cn("rounded-full px-2.5 py-1 transition-colors", value === k ? (k === "known" ? "bg-emerald-500/15 text-emerald-200" : "bg-amber-500/15 text-amber-200") : "text-slate-400 hover:text-white")}>
         {label}

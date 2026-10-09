@@ -45,6 +45,7 @@ async def startup():
     await db.analyses.create_index([("user_id", 1), ("updated_at", -1)])
     await db.analyses.create_index("id", unique=True)
     await db.guide_messages.create_index([("analysis_id", 1), ("created_at", 1)])
+    await db.analysis_events.create_index([("analysis_id", 1), ("created_at", 1)])
     await routes_auth.seed_demo_user()
 
 
