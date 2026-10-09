@@ -14,7 +14,7 @@ const OPENERS = {
   learn: "Help me make sense of what happened when I tried something.",
 };
 
-export const GuidePanel = forwardRef(({ analysisId, stage, onAnalysisChange, onClose }, ref) => {
+export const GuidePanel = forwardRef(({ analysisId, stage, onAnalysisChange, onClose, onGoStage }, ref) => {
   const [messages, setMessages] = useState(null);
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState(null);
@@ -57,7 +57,11 @@ export const GuidePanel = forwardRef(({ analysisId, stage, onAnalysisChange, onC
       const { data } = await api.post(`/analyses/${analysisId}/guide/proposals/${proposal.id}/accept`, body);
       onAnalysisChange(data.analysis);
       replaceMessage(data.message);
-      toast.success("Added to your analysis");
+      if (proposal.type === "experiment")
+        toast.success("Experiment added to Decide", { action: { label: "Open Decide", onClick: () => onGoStage?.("decide") } });
+      else if (proposal.type === "link")
+        toast.success("Link added to the map", { action: { label: "Open See", onClick: () => onGoStage?.("see") } });
+      else toast.success("Added to your analysis");
     } catch (e) { toast.error(errorMessage(e)); }
   };
   const dismiss = async (proposal) => {

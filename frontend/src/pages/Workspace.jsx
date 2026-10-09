@@ -11,6 +11,7 @@ import { DecideStage } from "@/components/workspace/DecideStage";
 import { LearnStage } from "@/components/workspace/LearnStage";
 import { GuidePanel } from "@/components/workspace/GuidePanel";
 import { TimelineSheet } from "@/components/workspace/TimelineSheet";
+import { BeforeAfterDialog } from "@/components/workspace/BeforeAfterDialog";
 import { api, errorMessage } from "@/lib/api";
 import { STAGES, SECTION_META } from "@/lib/brand";
 import { cn } from "@/lib/utils";
@@ -53,6 +54,7 @@ export default function Workspace() {
   const [learnExp, setLearnExp] = useState(null);
   const [guideOpen, setGuideOpen] = useState(false);
   const [timelineOpen, setTimelineOpen] = useState(false);
+  const [compare, setCompare] = useState({ open: false, learningId: null });
   const guideRef = useRef(null);
   const baseActions = useAnalysisActions(id, setAnalysis);
   const askGuide = useCallback((item) => {
@@ -104,17 +106,18 @@ export default function Workspace() {
               <p className="mt-2 text-slate-400" data-testid="stage-description">{current.text}</p>
             </div>
             {stage === "focus" && <FocusStage analysis={analysis} actions={actions} />}
-            {stage === "see" && <SeeStage analysis={analysis} actions={actions} />}
+            {stage === "see" && <SeeStage analysis={analysis} actions={actions} onCompare={(lid) => setCompare({ open: true, learningId: lid })} />}
             {stage === "decide" && <DecideStage analysis={analysis} actions={actions} onLearn={(expId) => { setLearnExp(expId); goStage("learn"); }} />}
-            {stage === "learn" && <LearnStage analysis={analysis} actions={actions} experimentId={learnExp} onRevise={() => goStage("see")} />}
+            {stage === "learn" && <LearnStage analysis={analysis} actions={actions} experimentId={learnExp} onRevise={() => goStage("see")} onCompare={(lid) => setCompare({ open: true, learningId: lid })} />}
           </div>
         </main>
         <aside className={cn("bg-[#0A0F1D] lg:sticky lg:top-16 lg:flex lg:h-[calc(100vh-4rem)] lg:border-l lwm-line",
           guideOpen ? "fixed inset-0 z-50 flex" : "hidden")} data-testid="guide-aside">
-          <div className="h-full w-full"><GuidePanel ref={guideRef} analysisId={id} stage={stage} onAnalysisChange={setAnalysis} onClose={() => setGuideOpen(false)} /></div>
+          <div className="h-full w-full"><GuidePanel ref={guideRef} analysisId={id} onGoStage={goStage} stage={stage} onAnalysisChange={setAnalysis} onClose={() => setGuideOpen(false)} /></div>
         </aside>
       </div>
       <TimelineSheet open={timelineOpen} onOpenChange={setTimelineOpen} analysisId={id} version={analysis.updated_at} />
+      <BeforeAfterDialog open={compare.open} onOpenChange={(open) => setCompare((c) => ({ ...c, open }))} analysis={analysis} learningId={compare.learningId} />
       {!guideOpen && (
         <Button onClick={() => setGuideOpen(true)} className="fixed bottom-5 right-5 z-40 h-12 rounded-full bg-blue-500 px-5 shadow-lg shadow-blue-500/25 hover:bg-blue-400 lg:hidden" data-testid="guide-open-btn">
           <MessageCircle className="mr-2 h-4 w-4" />Guide

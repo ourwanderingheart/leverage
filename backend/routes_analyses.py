@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from core import db, now_iso, new_id, get_current_user
 from models import (
     Analysis, AnalysisCreate, AnalysisSummary, AnalysisUpdate,
-    ItemIn, ItemUpdate, ExperimentIn, ExperimentUpdate, LearningIn, LinkIn, TimelineEvent,
+    ItemIn, ItemUpdate, ExperimentIn, ExperimentUpdate, LearningIn, LinkIn, TimelineEvent, MapSnapshot,
     SECTION_LABELS, EPISTEMIC_LABELS,
 )
 
@@ -94,6 +94,7 @@ async def delete_analysis(analysis_id: str, user: dict = Depends(get_current_use
         raise HTTPException(status_code=404, detail="Analysis not found")
     await db.guide_messages.delete_many({"analysis_id": analysis_id})
     await db.analysis_events.delete_many({"analysis_id": analysis_id})
+    await db.map_snapshots.delete_many({"analysis_id": analysis_id})
     return {"ok": True}
 
 
@@ -207,6 +208,10 @@ async def add_learning(analysis_id: str, body: LearningIn, user: dict = Depends(
     await log_event(analysis_id, user["user_id"], "learning", "Recorded a learning loop",
                     learning_id=entry["id"], experiment=exp["title"] if exp else None,
                     tried=body.tried, changed=body.changed, revise=body.revise)
+    await db.map_snapshots.insert_one({
+        "id": new_id("sn_"), "analysis_id": analysis_id, "user_id": user["user_id"], "learning_id": entry["id"],
+        "items": doc.get("items", []), "links": doc.get("links", []), "created_at": entry["created_at"],
+    })
     return await save_and_return(analysis_id, user["user_id"], {"$push": {"learnings": entry}})
 
 
@@ -223,3 +228,11 @@ async def timeline(analysis_id: str, user: dict = Depends(get_current_user)):
     events = await db.analysis_events.find({"analysis_id": analysis_id}, {"_id": 0}).sort("created_at", 1).to_list(5000)
     created = {"id": f"ev_start_{analysis_id}", "kind": "created", "summary": f"Started the analysis {_q(doc['title'])}", "created_at": doc["created_at"]}
     return [created, *events]
+
+
+@router.get("/{analysis_id}/snapshots", response_model=List[MapSnapshot])
+async def snapshots(analysis_id: str, user: dict = Depends(get_current_user)):
+    doc = await load_analysis(analysis_id, user["user_id"])
+    live = {le["id"] for le in doc.get("learnings", [])}
+    snaps = await db.map_snapshots.find({"analysis_id": analysis_id}, {"_id": 0}).sort("created_at", 1).to_list(500)
+    return [s for s in snaps if s["learning_id"] in live]

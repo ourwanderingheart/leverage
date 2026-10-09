@@ -66,6 +66,7 @@ export const LinksSection = ({ analysis, actions }) => {
               <span className="mx-2 inline-flex items-center gap-1 font-serif-ed italic text-sky-200">may influence <ArrowRight className="h-3 w-3" /></span>
               <span>{names[l.to_id]}</span>
               {l.note && <p className="mt-0.5 text-xs text-slate-500">{l.note}</p>}
+              {l.source === "guide" && <p className="mt-0.5 text-[11px] text-violet-300/80">Proposed by the Guide · confirmed by you</p>}
             </div>
             <button onClick={() => actions.deleteLink(l.id)} className="rounded p-1 text-slate-500 hover:bg-red-500/10 hover:text-red-300 md:opacity-0 md:group-hover:opacity-100" data-testid={`link-delete-${l.id}`} aria-label="Remove link">
               <Trash2 className="h-3.5 w-3.5" />

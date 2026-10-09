@@ -129,7 +129,15 @@ class Link(Doc):
     to_id: str
     note: str = ""
     epistemic: Epistemic = "unknown"
+    source: Literal["user", "guide"] = "user"
     created_at: str
+
+
+class MapSnapshot(Doc):
+    learning_id: str
+    created_at: str
+    items: List[Item] = []
+    links: List[Link] = []
 
 
 class LinkIn(BaseModel):
@@ -194,10 +202,16 @@ class AnalysisUpdate(BaseModel):
 
 class Proposal(Doc):
     id: str
-    section: Section
+    type: Literal["item", "link", "experiment"] = "item"
+    section: Optional[Section] = None
     text: str
-    epistemic: Epistemic
+    epistemic: Epistemic = "inferred"
     rationale: str = ""
+    from_id: Optional[str] = None
+    to_id: Optional[str] = None
+    from_text: str = ""
+    to_text: str = ""
+    experiment: Optional[dict] = None
     status: Literal["pending", "accepted", "dismissed"] = "pending"
     item_id: Optional[str] = None
 

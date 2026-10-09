@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Loader2, Trash2 } from "lucide-react";
+import { ArrowRight, Columns2, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -53,7 +53,7 @@ const LearningForm = ({ analysis, actions, experimentId }) => {
   );
 };
 
-const LearningEntry = ({ entry, experiment, actions, onRevise }) => (
+const LearningEntry = ({ entry, experiment, actions, onRevise, onCompare }) => (
   <li className="relative border-l border-sky-400/25 pb-8 pl-6" data-testid={`learning-${entry.id}`}>
     <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-cyan-300" />
     <div className="flex items-start justify-between gap-3">
@@ -65,13 +65,16 @@ const LearningEntry = ({ entry, experiment, actions, onRevise }) => (
         <div key={f.key}><dt className="text-slate-500">{f.label}</dt><dd className="mt-0.5 text-slate-200">{entry[f.key]}</dd></div>
       ))}
     </dl>
-    {entry.revise && (
-      <button onClick={onRevise} className="mt-3 inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200" data-testid={`learning-revise-${entry.id}`}>Revise the system picture in See <ArrowRight className="h-3 w-3" /></button>
-    )}
+    <div className="mt-3 flex flex-wrap gap-4">
+      {entry.revise && (
+        <button onClick={onRevise} className="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200" data-testid={`learning-revise-${entry.id}`}>Revise the system picture in See <ArrowRight className="h-3 w-3" /></button>
+      )}
+      <button onClick={() => onCompare(entry.id)} className="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200" data-testid={`learning-compare-${entry.id}`}><Columns2 className="h-3 w-3" />Compare map before / after</button>
+    </div>
   </li>
 );
 
-export const LearnStage = ({ analysis, actions, experimentId, onRevise }) => (
+export const LearnStage = ({ analysis, actions, experimentId, onRevise, onCompare }) => (
   <div className="space-y-8" data-testid="stage-learn">
     <LearningForm analysis={analysis} actions={actions} experimentId={experimentId} />
     <section data-testid="learning-timeline">
@@ -81,7 +84,7 @@ export const LearnStage = ({ analysis, actions, experimentId, onRevise }) => (
       ) : (
         <ol>
           {[...analysis.learnings].reverse().map((entry) => (
-            <LearningEntry key={entry.id} entry={entry} actions={actions} onRevise={onRevise} experiment={analysis.experiments.find((x) => x.id === entry.experiment_id)} />
+            <LearningEntry key={entry.id} entry={entry} actions={actions} onRevise={onRevise} onCompare={onCompare} experiment={analysis.experiments.find((x) => x.id === entry.experiment_id)} />
           ))}
         </ol>
       )}

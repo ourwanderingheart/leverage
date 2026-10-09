@@ -22,11 +22,13 @@ const ring = (list, rx, ry, offset = -Math.PI / 2) =>
     return { item, x: CX + rx * Math.cos(angle), y: CY + ry * Math.sin(angle) };
   });
 
-const Node = ({ x, y, item }) => {
+const Node = ({ x, y, item, prefix, highlight }) => {
   const anchor = Math.abs(x - CX) < 30 ? "middle" : x > CX ? "start" : "end";
   const dx = anchor === "middle" ? 0 : anchor === "start" ? 12 : -12;
   return (
-    <g data-testid={`map-node-${item.id}`}>
+    <g data-testid={`${prefix}-node-${item.id}`}>
+      <title>{`${item.text} (${EPISTEMIC[item.epistemic].label})`}</title>
+      {highlight && <circle cx={x} cy={y} r="15" fill="none" stroke="#22D3EE" strokeWidth="1.5" strokeOpacity="0.9" />}
       <title>{`${item.text} (${EPISTEMIC[item.epistemic].label})`}</title>
       <circle cx={x} cy={y} r="11" fill={COLORS[item.epistemic]} opacity="0.12" />
       <circle cx={x} cy={y} r="5" fill={COLORS[item.epistemic]} />
@@ -35,16 +37,16 @@ const Node = ({ x, y, item }) => {
   );
 };
 
-export const SystemMap = ({ analysis }) => {
+export const SystemMap = ({ analysis, caption = "System picture · working hypothesis, not truth", highlightIds, prefix = "map", testId = "system-map" }) => {
   const inner = ring(analysis.items.filter((i) => INNER.includes(i.section)).slice(0, 12), 205, 140);
   const outer = ring(analysis.items.filter((i) => i.section === "out_of_scope").slice(0, 6), 330, 205, -Math.PI / 3);
   const empty = inner.length + outer.length === 0;
   const pos = Object.fromEntries([...inner, ...outer].map((n) => [n.item.id, n]));
   const links = (analysis.links || []).filter((l) => pos[l.from_id] && pos[l.to_id]);
   return (
-    <section className="overflow-hidden rounded-2xl border lwm-line bg-[#080D1A]" data-testid="system-map">
+    <section className="overflow-hidden rounded-2xl border lwm-line bg-[#080D1A]" data-testid={testId}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b lwm-line px-5 py-3">
-        <p className="font-mono-ed text-[11px] uppercase tracking-[0.16em] text-slate-400">System picture · working hypothesis, not truth</p>
+        <p className="font-mono-ed text-[11px] uppercase tracking-[0.16em] text-slate-400">{caption}</p>
         <div className="flex flex-wrap gap-3 text-[11px] text-slate-400">
           {Object.entries(EPISTEMIC).map(([k, m]) => (
             <span key={k} className="inline-flex items-center gap-1.5"><span className={`h-2 w-2 rounded-full ${m.dot}`} />{m.label}</span>
@@ -76,11 +78,11 @@ export const SystemMap = ({ analysis }) => {
         <circle cx={CX} cy={CY} r="70" fill="url(#core)" />
         <circle cx={CX} cy={CY} r="9" fill="#E0F2FE" />
         <text x={CX} y={CY + 30} textAnchor="middle" className="fill-white" style={{ fontSize: 13, fontWeight: 600, fontFamily: "Outfit" }}>{clip(analysis.title, 30)}</text>
-        {inner.map((n) => <Node key={n.item.id} {...n} />)}
-        {outer.map((n) => <Node key={n.item.id} {...n} />)}
+        {inner.map((n) => <Node key={n.item.id} {...n} prefix={prefix} highlight={highlightIds?.has(n.item.id)} />)}
+        {outer.map((n) => <Node key={n.item.id} {...n} prefix={prefix} highlight={highlightIds?.has(n.item.id)} />)}
         {links.map((l) => (
-          <path key={l.id} d={linkPath(pos[l.from_id], pos[l.to_id])} fill="none" stroke={COLORS[l.epistemic]} strokeWidth="1.6" strokeOpacity="0.9"
-            strokeDasharray="6 5" markerEnd={`url(#arrow-${l.epistemic})`} data-testid={`map-link-${l.id}`}>
+          <path key={l.id} d={linkPath(pos[l.from_id], pos[l.to_id])} fill="none" stroke={COLORS[l.epistemic]} strokeWidth={highlightIds?.has(l.id) ? "2.4" : "1.6"} strokeOpacity="0.9"
+            strokeDasharray="6 5" markerEnd={`url(#arrow-${l.epistemic})`} data-testid={`${prefix}-link-${l.id}`}>
             <title>{`${pos[l.from_id].item.text} may influence ${pos[l.to_id].item.text}${l.note ? ` — ${l.note}` : ""}`}</title>
           </path>
         ))}
