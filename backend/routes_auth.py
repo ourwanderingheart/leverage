@@ -50,10 +50,12 @@ async def login(body: LoginIn, request: Request, response: Response):
         raise HTTPException(status_code=429, detail="Too many attempts. Please try again in 15 minutes.")
     user = await db.users.find_one({"email": email})
     if not user or not user.get("password_hash") or not verify_password(body.password, user["password_hash"]):
-        count = (attempt or {}).get("count", 0) + 1
+        expired = attempt and attempt.get("count", 0) >= MAX_ATTEMPTS
+        count = 1 if expired else (attempt or {}).get("count", 0) + 1
+        locked_until = (now() + LOCKOUT).isoformat() if count >= MAX_ATTEMPTS else ""
         await db.login_attempts.update_one(
             {"identifier": identifier},
-            {"$set": {"count": count, "locked_until": (now() + LOCKOUT).isoformat()}},
+            {"$set": {"count": count, "locked_until": locked_until}},
             upsert=True,
         )
         raise HTTPException(status_code=401, detail="Invalid email or password.")

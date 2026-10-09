@@ -1,0 +1,26 @@
+{
+  "summary": "Full-stack testing (backend pytest + frontend playwright) for Leverage What Matters MVP. 17/17 backend tests pass covering auth (register/login/refresh/logout, duplicate+wrong-password, me unauth), analyses CRUD, items/experiments/learnings CRUD, user isolation (B cannot access A's analysis -> 404 for GET/PATCH/DELETE/add-item), and guide message listing. Frontend verified: home with 8 method-step testids, About philosophy statement/quote, protected-route redirect to /signin, signup -> /dashboard, signin wrong-password shows auth-error, create analysis -> workspace, focus-question save, add in_scope item, stage tab navigation (focus/see/decide/learn), system-map visible, experiment dialog + save, guide message streaming works (returned labelled YOU TOLD ME / I'M WONDERING / WE DON'T KNOW YET / QUESTION blocks + 3 proposals rendered), signout via user-menu, mobile 390px nav-mobile-toggle + guide-open-btn/guide-close-btn full-screen panel, tablet 768px layout OK.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "routes_auth.login: brute-force counter is reset to a fresh 15-min lockout on EVERY failed attempt (sets locked_until each time) even if attempts < MAX_ATTEMPTS. That's fine, but delete_login_attempts on success means attackers can never trigger lockout alternating with another IP+email identifier (identifier includes IP+email so this is OK). The locked_until comparison uses string ISO comparison which only works because both are ISO-8601 UTC with same offset format -- fragile. Consider parsing to datetime.",
+    "accept_proposal response returns both analysis and message; good. But proposal 'known' from guide becomes item with source='guide'; UI should surface 'Proposed by the Guide' marker -- verified visually.",
+    "routes_guide.send_message: inserts user_msg BEFORE verifying LLM success. If LLM throws, the user message persists but no assistant reply -- acceptable but could leave orphaned turns.",
+    "No rate-limiting on /api/analyses/{id}/guide/messages -- a user could spam the LLM. Consider per-user quota.",
+    "Expected data-testid 'guide-start-btn' is only shown when no history exists; when history exists only 'guide-input' is present. Test matrix says 'guide-start-btn or guide-input + guide-send-btn' so both are acceptable paths.",
+    "Dashboard row has data-testid='analysis-row-{id}' on <li> but navigation uses inner <Link data-testid='open-analysis-{id}'>; main agent should ensure tests/users click the Link, not the row. Not a bug."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (17/17)", "frontend": "100% of critical flows"},
+  "test_credentials": "demo@leveragewhatmatters.com / Leverage8! (verified). Also created TEST_fe_* and TEST_a/b_* users during tests.",
+  "seed_data_creation": "Backend tests create and delete their own TEST_* users and TEST_* analyses. Did not clean test users from users collection (safe since prefixed TEST_).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend regression suite at /app/backend/tests/backend_test.py runs cleanly in ~4s via pytest-xdist. Google OAuth path was NOT exercised end-to-end (requires real session_id from Emergent service); backend session cookie code path is covered by _session_user_id but not integration-tested. Guide SSE streaming is covered implicitly via the frontend playwright test which observed a full labelled reply and 3 proposals; no direct SSE pytest. The demo account auto-seeded analysis 'Team stalls' is reused for guide testing."
+}

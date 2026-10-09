@@ -1,0 +1,25 @@
+# Leverage What Matters — PRD
+
+## Original problem statement (summary)
+AI-guided thinking platform for complex challenges. Philosophy: Human thinks. AI structures. Human decides. Visible journey Focus → See → Decide → Learn, underpinned by the Leverage 8 Method (L-E-V-E-R-A-G-E). Epistemic model Known / Inferred / Unknown; never silently convert inferences to facts; system map is a working hypothesis. Conversational Guide per analysis: one question at a time, "You told me / I'm wondering / We don't know yet", proposes updates requiring confirmation. Brand: deep navy, electric blue, cyan, violet; premium, editorial, calm. Public site: Home, About, Sign in, Sign up. Phase 1 = public site, auth, dashboard, create analysis, 4-stage shell, saved analyses, basic Guide.
+
+## User choices
+GPT-5.2 via Emergent LLM key · JWT email/password + Emergent Google login · AI-generated brand visuals · basic propose-and-confirm.
+
+## Architecture
+- Backend FastAPI (modular): core.py (db, JWT, unified get_current_user for JWT cookie / Google session cookie / Bearer), models.py, routes_auth.py, routes_analyses.py, routes_guide.py (SSE streaming via emergentintegrations LlmChat, openai/gpt-5.2).
+- MongoDB collections: users (user_id uuid), user_sessions (Google), login_attempts, analyses (embedded items / experiments / learnings), guide_messages (with proposals[]).
+- Frontend React + shadcn + Tailwind: AuthContext, ProtectedRoute, pages (Home, About, AuthPage, AuthCallback, Dashboard, NewAnalysis, Workspace), workspace components (StageTabs, FocusStage, SeeStage+SystemMap SVG, DecideStage+ExperimentDialog, LearnStage, GuidePanel, GuideMessage, ProposalCard, ItemList, EpistemicBadge).
+
+## Implemented (2026-06, Phase 1)
+- Public Home/About with brand visuals (Ribbon 8, Emerging Path, Focused System), Leverage 8 section, philosophy statement + quote
+- JWT auth (access 15m + refresh 7d httpOnly cookies, bcrypt, brute-force lockout) + Emergent Google login; demo user seeded
+- Dashboard: list/search/delete analyses with epistemic counts & stage
+- Workspace: Focus (focus question, framing edit, in/out of scope), See (SVG system map + 6 sections), Decide (unranked leverage, experiments CRUD + status), Learn (learning loops timeline, link back to See); stage persisted
+- Guide: streaming GPT-5.2, labelled blocks, one-question card, proposals with edit/relabel → confirm/dismiss
+- Tested: iteration_1 100% backend (17 tests) & frontend critical flows
+
+## Backlog
+- P1: editable relationships as explicit A→B links on the map; revision history / "what changed" diff over time; guide rate limiting
+- P1: password reset flow; account settings
+- P2: export/share analysis (PDF), templates/sample analyses, richer causal loop diagrams, multi-analysis insights
