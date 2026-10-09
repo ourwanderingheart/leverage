@@ -1,0 +1,22 @@
+{
+  "summary": "Iteration 2: tested the three new features (Relationship links, Thinking timeline, Assumption check) end-to-end plus regression. Backend pytest suite grew from 17 to 28 tests, 100% pass in ~6s. Playwright flow logged in demo user, created a new analysis, moved to See stage, verified links-need-items when <2 items, added 2 patterns items, added a link via link-from-select / link-to-select / link-note-input / add-link-kind-unknown / link-add-btn, confirmed row link-{id} and dashed arrow map-link-{id} render, duplicate link produced the 'already exists' toast, timeline-open-btn opened timeline-sheet showing timeline-group-0 with created+item_added+link_added events, deleted the link, marked an item as unknown via item-mark-unknown-{id}, confirmed item-check-{id} appeared only for non-known items (1 check for 2 items), reopened timeline and saw item_relabelled + link_removed events, clicked item-check which auto-sent a user message starting 'How could I check this?' to the Guide, and on mobile 390px guide-open-btn remained visible. No bugs found.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "routes_analyses.delete_item: pulls links in two sequential update_one calls instead of a single $pull with $or; works but costs 3 writes per item deletion. Minor.",
+    "routes_analyses.add_link: duplicate detection is directional only (A->B blocks only A->B, not B->A). Product-wise that may be intentional ('may influence' is directional) — fine, but confirm with PM.",
+    "TimelineSheet effect depends on `version` (analysis.updated_at) to re-fetch; stage-only PATCHes still bump updated_at in save_and_return, so timeline refetches without new events. Harmless but a redundant GET.",
+    "LinksSection filters options by MAP_SECTIONS; if a user adds items only in sections NOT in MAP_SECTIONS (e.g., leverage, boundaries) the UI will still show links-need-items even with >=2 items. Verified MAP_SECTIONS includes stakeholders/patterns/loops/in_scope/assumptions/relationships/out_of_scope per spec — OK.",
+    "Workspace askGuide calls guideRef.current?.ask without checking if ref is attached when aside is hidden on desktop; works because aside is rendered (hidden class) so GuidePanel mounts. If aside stops mounting while hidden this will silently fail.",
+    "No rate limit on POST /analyses/{id}/links; a user could spam create+delete to pollute timeline. Low priority."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (28/28)", "frontend": "100% of critical flows"},
+  "test_credentials": "demo@leveragewhatmatters.com / Leverage8! (verified)",
+  "seed_data_creation": "Backend tests create TEST_a_/TEST_b_ users and TEST_links analyses; frontend created TEST_links_fe analysis under demo user (not cleaned up).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Links+timeline+assumption-check pass. Backend suite at /app/backend/tests/backend_test.py (28 tests). Known testids used: links-section, links-need-items, link-form, link-from-select, link-to-select, link-note-input, add-link-kind-known|unknown, link-add-btn, link-{id}, link-delete-{id}, links-count, map-link-{id}, timeline-open-btn, timeline-sheet, timeline-group-0, timeline-loop-N, timeline-event-{kind}, item-check-{id}. Auth testids are auth-email-input/auth-password-input/auth-submit-btn (NOT signin-*). New analysis route is /analysis/new. One leftover TEST_links_fe analysis on demo user — fine to delete."
+}

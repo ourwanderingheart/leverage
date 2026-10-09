@@ -195,6 +195,102 @@ class TestAnalyses:
         assert r.status_code == 404
 
 
+# ---------- Links & Timeline ----------
+class TestLinksAndTimeline:
+    @pytest.fixture(scope="class")
+    def ctx(self, user_a_session, user_b_session):
+        sa, _ = user_a_session
+        r = sa.post(f"{API}/analyses", json={"title": "TEST_links", "challenge": "C"})
+        aid = r.json()["id"]
+        ids = []
+        for text in ["Alpha", "Beta", "Gamma"]:
+            r = sa.post(f"{API}/analyses/{aid}/items", json={"section": "patterns", "text": text, "epistemic": "known"})
+            assert r.status_code == 200
+            ids.append(next(i["id"] for i in r.json()["items"] if i["text"] == text))
+        return {"sa": sa, "sb": user_b_session[0], "aid": aid, "items": ids}
+
+    def test_add_link_ok(self, ctx):
+        r = ctx["sa"].post(f"{API}/analyses/{ctx['aid']}/links",
+                           json={"from_id": ctx["items"][0], "to_id": ctx["items"][1], "note": "may delay", "epistemic": "unknown"})
+        assert r.status_code == 200, r.text
+        links = r.json()["links"]
+        assert len(links) == 1
+        assert links[0]["from_id"] == ctx["items"][0]
+        assert links[0]["to_id"] == ctx["items"][1]
+        assert links[0]["note"] == "may delay"
+        assert links[0]["epistemic"] == "unknown"
+        ctx["link_id"] = links[0]["id"]
+
+    def test_duplicate_link_rejected(self, ctx):
+        r = ctx["sa"].post(f"{API}/analyses/{ctx['aid']}/links",
+                           json={"from_id": ctx["items"][0], "to_id": ctx["items"][1]})
+        assert r.status_code == 400
+        assert "already exists" in r.json()["detail"].lower()
+
+    def test_same_item_rejected(self, ctx):
+        r = ctx["sa"].post(f"{API}/analyses/{ctx['aid']}/links",
+                           json={"from_id": ctx["items"][0], "to_id": ctx["items"][0]})
+        assert r.status_code == 400
+
+    def test_unknown_item_404(self, ctx):
+        r = ctx["sa"].post(f"{API}/analyses/{ctx['aid']}/links",
+                           json={"from_id": ctx["items"][0], "to_id": "it_nope"})
+        assert r.status_code == 404
+
+    def test_link_user_isolation(self, ctx):
+        r = ctx["sb"].post(f"{API}/analyses/{ctx['aid']}/links",
+                           json={"from_id": ctx["items"][0], "to_id": ctx["items"][2]})
+        assert r.status_code == 404
+
+    def test_delete_link(self, ctx):
+        # add a 2nd link
+        r = ctx["sa"].post(f"{API}/analyses/{ctx['aid']}/links",
+                           json={"from_id": ctx["items"][1], "to_id": ctx["items"][2]})
+        assert r.status_code == 200
+        lid = next(l["id"] for l in r.json()["links"] if l["from_id"] == ctx["items"][1])
+        r = ctx["sa"].delete(f"{API}/analyses/{ctx['aid']}/links/{lid}")
+        assert r.status_code == 200
+        assert all(l["id"] != lid for l in r.json()["links"])
+
+    def test_delete_item_removes_links(self, ctx):
+        # delete item 1 (Beta) - should kill the remaining link from items[0]->items[1]
+        r = ctx["sa"].delete(f"{API}/analyses/{ctx['aid']}/items/{ctx['items'][1]}")
+        assert r.status_code == 200
+        assert all(ctx["items"][1] not in (l["from_id"], l["to_id"]) for l in r.json()["links"])
+
+    def test_timeline_shape(self, ctx):
+        r = ctx["sa"].get(f"{API}/analyses/{ctx['aid']}/timeline")
+        assert r.status_code == 200
+        events = r.json()
+        kinds = [e["kind"] for e in events]
+        assert kinds[0] == "created"
+        for expected in ["item_added", "link_added", "link_removed", "item_removed"]:
+            assert expected in kinds, f"missing {expected} in {kinds}"
+
+    def test_timeline_stage_change_no_event(self, ctx):
+        before = len(ctx["sa"].get(f"{API}/analyses/{ctx['aid']}/timeline").json())
+        r = ctx["sa"].patch(f"{API}/analyses/{ctx['aid']}", json={"stage": "see"})
+        assert r.status_code == 200
+        after = len(ctx["sa"].get(f"{API}/analyses/{ctx['aid']}/timeline").json())
+        assert before == after, "stage-only change must not create events"
+
+    def test_timeline_framing_focus_relabel_events(self, ctx):
+        aid = ctx["aid"]
+        ctx["sa"].patch(f"{API}/analyses/{aid}", json={"focus_question": "What delays us?"})
+        ctx["sa"].patch(f"{API}/analyses/{aid}", json={"title": "TEST_links_v2"})
+        # relabel Alpha from known -> unknown
+        ctx["sa"].patch(f"{API}/analyses/{aid}/items/{ctx['items'][0]}", json={"epistemic": "unknown"})
+        # revise text
+        ctx["sa"].patch(f"{API}/analyses/{aid}/items/{ctx['items'][0]}", json={"text": "Alpha revised"})
+        kinds = [e["kind"] for e in ctx["sa"].get(f"{API}/analyses/{aid}/timeline").json()]
+        for expected in ["focus", "framing", "item_relabelled", "item_revised"]:
+            assert expected in kinds, f"missing {expected} in {kinds}"
+
+    def test_timeline_user_isolation(self, ctx):
+        r = ctx["sb"].get(f"{API}/analyses/{ctx['aid']}/timeline")
+        assert r.status_code == 404
+
+
 # ---------- Guide (basic non-LLM endpoints) ----------
 class TestGuide:
     def test_list_guide_messages_empty(self, demo_session):

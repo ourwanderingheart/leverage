@@ -19,7 +19,13 @@ GPT-5.2 via Emergent LLM key · JWT email/password + Emergent Google login · AI
 - Guide: streaming GPT-5.2, labelled blocks, one-question card, proposals with edit/relabel → confirm/dismiss
 - Tested: iteration_1 100% backend (17 tests) & frontend critical flows
 
+## Implemented (Iteration 2)
+- Relationship links: "A may influence B" between map items (Observed / To check), drawn as dashed arrows on the system map; removed with their items; included in Guide context
+- Thinking timeline: `analysis_events` change log (added / revised / relabelled / removed items, links, experiments, focus & framing edits, Guide confirmations, learning loops); side sheet grouped by learning loop
+- Assumption check: "How could I check this?" on Unknown/Inferred items sends a verification prompt to the Guide
+- Tested: iteration_2 100% (28 backend tests + frontend flows)
+
 ## Backlog
-- P1: editable relationships as explicit A→B links on the map; revision history / "what changed" diff over time; guide rate limiting
+- P1: revision diff view between two points in time; guide rate limiting
 - P1: password reset flow; account settings
 - P2: export/share analysis (PDF), templates/sample analyses, richer causal loop diagrams, multi-analysis insights
