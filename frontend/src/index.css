@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 228 48% 5%;
+        --foreground: 210 40% 98%;
+        --card: 224 45% 9%;
+        --card-foreground: 210 40% 98%;
+        --popover: 224 45% 9%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 217 91% 60%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 222 35% 15%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 222 35% 13%;
+        --muted-foreground: 215 20% 65%;
+        --accent: 222 35% 16%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 222 30% 17%;
+        --input: 222 30% 20%;
+        --ring: 217 91% 60%;
+        --radius: 0.75rem;
+        --lwm-bg: #070A14;
+        --lwm-surface: #0C1222;
+        --lwm-surface-2: #111A2E;
+        --lwm-line: rgba(148, 163, 184, 0.14);
+        --lwm-blue: #3B82F6;
+        --lwm-cyan: #22D3EE;
+        --lwm-violet: #8B5CF6;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+        @apply bg-background text-foreground;
+        margin: 0;
+        background: var(--lwm-bg);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    ::selection { background: rgba(34, 211, 238, 0.28); color: #fff; }
+    h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; }
+}
+
+@layer utilities {
+    .font-display { font-family: 'Outfit', sans-serif; }
+    .font-serif-ed { font-family: 'Instrument Serif', serif; }
+    .font-mono-ed { font-family: 'JetBrains Mono', monospace; }
+    .lwm-eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #7DD3FC;
+    }
+    .lwm-gradient-text {
+        background: linear-gradient(100deg, #F8FAFC 0%, #BAE6FD 45%, #A5B4FC 75%, #C4B5FD 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .lwm-line { border-color: var(--lwm-line); }
+    .lwm-panel { background: var(--lwm-surface); border: 1px solid var(--lwm-line); }
+    .lwm-glass { background: rgba(9, 13, 26, 0.78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+    .lwm-screen { mix-blend-mode: screen; }
+}
+
+.lwm-grain::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes lwm-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.lwm-rise { opacity: 0; animation: lwm-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+.lwm-d1 { animation-delay: 0.08s; }
+.lwm-d2 { animation-delay: 0.18s; }
+.lwm-d3 { animation-delay: 0.3s; }
+.lwm-d4 { animation-delay: 0.45s; }
+
+@keyframes lwm-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+.lwm-typing span { animation: lwm-pulse 1.2s infinite; }
+.lwm-typing span:nth-child(2) { animation-delay: 0.2s; }
+.lwm-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+.lwm-question-glow { box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25), 0 10px 40px -12px rgba(34, 211, 238, 0.35); }
+
+.lwm-scroll::-webkit-scrollbar { width: 8px; }
+.lwm-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.18); border-radius: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .lwm-rise { animation: none; opacity: 1; }
+}
+
+[data-debug-wrapper="true"] { display: contents !important; }

@@ -1,0 +1,131 @@
+{
+  "project_name": "Leverage What Matters",
+  "app_type": "hybrid_fullstack",
+  "brand_identity": {
+    "positioning": "AI-guided thinking for complex problems",
+    "tagline": "See the system. Find what matters.",
+    "core_philosophy": "Human thinks. AI structures. Human decides.",
+    "visual_direction": "Deep navy & near-black base with electric blue, cyan, and restrained violet accents. Premium, modern, editorial, calm, and thoughtful. Avoids cyberpunk, excessive neon, gaming UI, generic AI network slop, or giant card walls.",
+    "quote": "The goal is not to remove uncertainty. It is to make uncertainty easier to reason with.",
+    "key_visual_concepts": {
+      "concept_a": "Evolved Ribbon 8 - Flowing infinity/8 geometric symbol representing the iterative Leverage 8 Method",
+      "concept_d": "Emerging Path - Layered light pathways cutting through complexity for Hero sections",
+      "concept_c": "Focused System - Constellation of nodes and causal loops with highlighted leverage points"
+    }
+  },
+  "typography": {
+    "font_family_heading": "'Outfit', 'Cabinet Grotesk', -apple-system, sans-serif",
+    "font_family_body": "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif",
+    "font_family_mono": "'JetBrains Mono', 'Fira Code', monospace",
+    "scale": {
+      "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]",
+      "h2_section": "text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight leading-snug",
+      "h3_card": "text-xl sm:text-2xl font-medium tracking-tight",
+      "subheading": "text-lg sm:text-xl text-slate-300 font-normal leading-relaxed",
+      "body_lg": "text-base sm:text-lg text-slate-300 leading-relaxed",
+      "body_base": "text-sm sm:text-base text-slate-400 leading-normal",
+      "caption": "text-xs text-slate-500 tracking-wider uppercase font-mono"
+    }
+  },
+  "colors": {
+    "theme": "dark_primary_with_light_support",
+    "palette": {
+      "bg_root": "#0B0F19",
+      "bg_surface_dark": "#111827",
+      "bg_surface_card": "#1E293B",
+      "bg_surface_card_hover": "#26354A",
+      "bg_glass": "rgba(15, 23, 42, 0.75)",
+      "border_subtle": "rgba(255, 255, 255, 0.08)",
+      "border_accent": "rgba(59, 130, 246, 0.3)",
+      "electric_blue": "#3B82F6",
+      "electric_blue_hover": "#2563EB",
+      "cyan_accent": "#06B6D4",
+      "violet_accent": "#8B5CF6",
+      "text_primary": "#F8FAFC",
+      "text_secondary": "#94A3B8",
+      "text_muted": "#64748B"
+    },
+    "epistemic_model_colors": {
+      "known": {
+        "label": "Known (user-provided)",
+        "badge_bg": "bg-emerald-500/10",
+        "badge_text": "text-emerald-400",
+        "badge_border": "border-emerald-500/20",
+        "dot": "bg-emerald-400"
+      },
+      "inferred": {
+        "label": "Inferred (AI hypothesis)",
+        "badge_bg": "bg-violet-500/10",
+        "badge_text": "text-violet-300",
+        "badge_border": "border-violet-500/30",
+        "dot": "bg-violet-400"
+      },
+      "unknown": {
+        "label": "Unknown (missing)",
+        "badge_bg": "bg-amber-500/10",
+        "badge_text": "text-amber-300",
+        "badge_border": "border-amber-500/20",
+        "dot": "bg-amber-400"
+      }
+    }
+  },
+  "spacing_and_layout": {
+    "container_max_width": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "section_padding": "py-16 sm:py-24 lg:py-32",
+    "card_padding": "p-6 sm:p-8",
+    "gap_grid": "gap-6 sm:gap-8",
+    "border_radius": "rounded-xl"
+  },
+  "media_assets": {
+    "hero_emerging_path": "https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2OTV8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG5ldHdvcmslMjBsaWdodCUyMHBhdGh3YXlzJTIwbm9kZXMlMjBkYXJrJTIwbmF2eSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzkxNTgzOTA5fDA&ixlib=rb-4.1.0&q=85",
+    "focused_system_nodes": "https://images.unsplash.com/photo-1639322537228-f710d846310a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2OTV8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMG5ldHdvcmslMjBsaWdodCUyMHBhdGh3YXlzJTIwbm9kZXMlMjBkYXJrJTIwbmF2eSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzkxNTgzOTA5fDA&ixlib=rb-4.1.0&q=85",
+    "thoughtful_thinker_male": "https://images.unsplash.com/photo-1544280124-2f0a80ccee73?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHszfHx0aG91Z2h0ZnVsJTIwcGVyc29uJTIwZGFyayUyMHN0dWRpbyUyMGJsdWUlMjBsaWdodHxlbnwwfHx8fDE3OTE1ODM5MTd8MA&ixlib=rb-4.1.0&q=85",
+    "thoughtful_thinker_female": "https://images.unsplash.com/photo-1626858707111-2fefbc9a848e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHw0fHx0aG91Z2h0ZnVsJTIwcGVyc29uJTIwZGFyayUyMHN0dWRpbyUyMGJsdWUlMjBsaWdodHxlbnwwfHx8fDE3OTE1ODM5MTd8MA&ixlib=rb-4.1.0&q=85"
+  },
+  "leverage_8_method_steps": [
+    {"code": "L", "name": "Locate the Challenge", "description": "Define the bound problem, current state, and desired outcome without jumping to solutions."},
+    {"code": "E", "name": "Examine Patterns", "description": "Identify trends, recurring behaviors, and systemic shifts over time."},
+    {"code": "V", "name": "View the System", "description": "Map key entities, boundaries, feedback loops, and surrounding environmental influences."},
+    {"code": "E", "name": "Expose Assumptions", "description": "Surface hidden premises, mental models, and unverified beliefs."},
+    {"code": "R", "name": "Reveal Relationships", "description": "Trace causal pathways, dependencies, and unexpected side effects between components."},
+    {"code": "A", "name": "Assess Leverage", "description": "Locate high-impact intervention points where small force creates systemic shift."},
+    {"code": "G", "name": "Generate Experiments", "description": "Design low-cost, testable actions with clear learning metrics."},
+    {"code": "E", "name": "Evaluate Learning", "description": "Review outcomes, capture surprises, update systemic understanding, and refine strategy."}
+  ],
+  "component_guidelines": {
+    "navigation_header": {
+      "style": "Sticky top-0 z-50 backdrop-blur-xl bg-[#0B0F19]/80 border-b border-white/10 px-6 py-4 flex items-center justify-between",
+      "desktop_links": ["Features", "Methodology", "Why Us", "About"],
+      "ctas": ["Sign In", "Get Started"]
+    },
+    "ai_guide_panel": {
+      "style": "Fixed or sliding side-panel (width 380px-420px) with sleek border-l border-white/10 bg-[#111827]/95 backdrop-blur-xl p-6 flex flex-col h-full",
+      "sections": [
+        "One question at a time focus container with glow accent",
+        "Categorized insights: 'You told me', 'I'm wondering', 'We don't know yet'",
+        "Propose & Confirm update cards with 'Confirm & Apply' and 'Refine' buttons"
+      ]
+    },
+    "workspace_tabs": {
+      "tabs": ["Focus", "See", "Decide", "Learn"],
+      "style": "Inline pill tabs with active cyan/electric blue subtle underline glow and active state background bg-white/10"
+    },
+    "epistemic_card": {
+      "style": "Bordered surface card (border-white/10 hover:border-blue-500/40) with prominent Epistemic Badge (Known / Inferred / Unknown), source note, and edit/confirm action"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Ensure every page and workspace tab is fully functional and responsive across mobile, tablet, and desktop.",
+    "Implement mock auth state management (localStorage or Context) supporting Sign In / Sign Up (Email & Password + Google mock) and Seamless Sign Out.",
+    "Ensure AI Guide panel allows active user interaction: asking questions sequentially, offering 'Propose & Confirm' action cards that directly update the analysis workspace upon confirmation.",
+    "Add pre-populated realistic sample analyses (e.g. 'Enterprise Churn Reduction', 'Supply Chain Bottleneck in Q3', 'AI Feature Adoption Strategy') so users see immediate value.",
+    "Include data-testid attributes on all interactive elements (buttons, nav links, inputs, tabs, cards, confirm actions) following kebab-case naming."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": {
+    "testing_requirement": "All interactive and key informational elements MUST include a data-testid attribute in kebab-case format.",
+    "header_transparency": "DO NOT use complete transparent backgrounds for sticky headers or dropdown menus. Use glassmorphism backdrop-blur-xl bg-[#0B0F19]/80 or solid dark backgrounds.",
+    "typography_rules": "Use Outfit or Cabinet Grotesk for display headers, Plus Jakarta Sans or Inter for body. Do not default to plain Inter for large headings.",
+    "hover_contrast": "Ensure hover states explicitly set high-contrast text colors to prevent dark-on-dark invisible text.",
+    "spacing_philosophy": "Maintain generous padding (p-6, p-8, p-12) to create breathing room and an editorial, high-end visual tone."
+  }
+}
