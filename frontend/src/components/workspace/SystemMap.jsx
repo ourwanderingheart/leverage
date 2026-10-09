@@ -29,7 +29,6 @@ const Node = ({ x, y, item, prefix, highlight }) => {
     <g data-testid={`${prefix}-node-${item.id}`}>
       <title>{`${item.text} (${EPISTEMIC[item.epistemic].label})`}</title>
       {highlight && <circle cx={x} cy={y} r="15" fill="none" stroke="#22D3EE" strokeWidth="1.5" strokeOpacity="0.9" />}
-      <title>{`${item.text} (${EPISTEMIC[item.epistemic].label})`}</title>
       <circle cx={x} cy={y} r="11" fill={COLORS[item.epistemic]} opacity="0.12" />
       <circle cx={x} cy={y} r="5" fill={COLORS[item.epistemic]} />
       <text x={x + dx} y={anchor === "middle" ? y - 16 : y + 4} textAnchor={anchor} className="fill-slate-300" style={{ fontSize: 12, fontFamily: "Plus Jakarta Sans" }}>{clip(item.text)}</text>

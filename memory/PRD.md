@@ -25,6 +25,11 @@ GPT-5.2 via Emergent LLM key · JWT email/password + Emergent Google login · AI
 - Assumption check: "How could I check this?" on Unknown/Inferred items sends a verification prompt to the Guide
 - Tested: iteration_2 100% (28 backend tests + frontend flows)
 
+## Implemented (Iteration 3)
+- Guide proposals now typed: item | link | experiment. Link proposals reference existing item ids (validated, no self/duplicate); experiment proposals are always included for "How could I check this?" and become a planned Decide experiment with one tap (toast → Open Decide)
+- Before/After view: map snapshot (`map_snapshots`) stored on each learning loop; compare dialog shows Before vs After (next loop or now) side by side with ringed changes + diff list; entry from See (compare button) and each Learn entry
+- Tested: iteration_3 100% (38 backend tests + frontend flows)
+
 ## Backlog
 - P1: revision diff view between two points in time; guide rate limiting
 - P1: password reset flow; account settings
